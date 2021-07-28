@@ -35,9 +35,17 @@ def format_AA(df):
 
 def format_FTM(df):
     '''
-    TODO
-    '''
-    return df
+        function for custom processing of FTM formatted vendor excel file
+
+        input: pandas DataFrame with the following columns: ["Cue Title", "Writers", "Publishers", "ISRC"]
+
+        output: pandas DataFrame with columns specified by final_columns
+            ex. ["File Name", "Song Name", "Library", "Composer","Publisher","Catalogue Number"]
+    '''    
+    df.rename(columns = {"Cue Title":"File Name", "Writers":"Composer", "Publishers":"Publisher", "ISRC":"Catalogue Number"}, inplace=True)
+    df["Song Name"]=df["File Name"].str[len("FTMX_"):]
+
+    return df[final_columns]
 
 def format_SignatureTracks(df):
     '''
@@ -49,12 +57,12 @@ if __name__ == "__main__":
     print("Running file merger")
     final_columns = ["File Name", "Song Name", "Library", "Composer","Publisher","Catalogue Number"]
     vendor_files = [
-        {"vendor":"FTM","filename": "data/FTM-AA_COMPOSER-PUBLISHER_6-16-21.xlsx", "sheetname":"AA"}
-        ,{"vendor":"AA","filename": "data/FTM-AA_COMPOSER-PUBLISHER_6-16-21.xlsx", "sheetname":"FTM"}
+        {"vendor":"FTM","filename": "data/FTM-AA_COMPOSER-PUBLISHER_6-16-21.xlsx", "sheetname":"FTM"}
+        ,{"vendor":"AA","filename": "data/FTM-AA_COMPOSER-PUBLISHER_6-16-21.xlsx", "sheetname":"AA"}
         ,{"vendor":"SignatureTracks","filename": "data/Signature Tracks - Composer Publisher Info_072621.xlsx"}
         ,{"vendor":"STKA","filename": "data/STKA_CLIENT_ThruADD86.xlsx"}
     ]
 
-    df = format_STKA(read_vendor_file(vendor_files[3]))
+    df = format_FTM(read_vendor_file(vendor_files[0]))
     print(df.head())
     
