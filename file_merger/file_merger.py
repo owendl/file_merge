@@ -29,9 +29,16 @@ def format_STKA(df):
 
 def format_AA(df):
     '''
-    TODO
+        function for custom processing of FTM formatted vendor excel file
+
+        input: pandas DataFrame with the following columns: ["Cue Title", "Writers", "Publishers", "ISRC"]
+
+        output: pandas DataFrame with columns specified by final_columns
+            ex. ["File Name", "Song Name", "Library", "Composer","Publisher","Catalogue Number"]
     '''
-    return df
+    df.rename(columns = {"Cue Title":"File Name", "Writers":"Composer", "Publishers":"Publisher", "ISRC":"Catalogue Number"}, inplace=True)
+    df["Song Name"]=df["File Name"].str[len("AA_"):]
+    return df[final_columns]
 
 def format_FTM(df):
     '''
@@ -63,6 +70,6 @@ if __name__ == "__main__":
         ,{"vendor":"STKA","filename": "data/STKA_CLIENT_ThruADD86.xlsx"}
     ]
 
-    df = format_FTM(read_vendor_file(vendor_files[0]))
+    df = format_AA(read_vendor_file(vendor_files[1]))
     print(df.head())
     
