@@ -38,6 +38,8 @@ def format_AA(df):
     '''
     df.rename(columns = {"Cue Title":"File Name", "Writers":"Composer", "Publishers":"Publisher", "ISRC":"Catalogue Number"}, inplace=True)
     df["Song Name"]=df["File Name"].str[len("AA_"):]
+    df["Composer"] = df["Composer"].apply(lambda x: clean_composer_publisher_FTM_AA(x))
+    df["Publisher"] = df["Publisher"].apply(lambda x: clean_composer_publisher_FTM_AA(x))
     return df[final_columns]
 
 def format_FTM(df):
@@ -51,7 +53,8 @@ def format_FTM(df):
     '''    
     df.rename(columns = {"Cue Title":"File Name", "Writers":"Composer", "Publishers":"Publisher", "ISRC":"Catalogue Number"}, inplace=True)
     df["Song Name"]=df["File Name"].str[len("FTMX_"):]
-
+    df["Composer"] = df["Composer"].apply(lambda x: clean_composer_publisher_FTM_AA(x))
+    df["Publisher"] = df["Publisher"].apply(lambda x: clean_composer_publisher_FTM_AA(x))
     return df[final_columns]
 
 def format_SignatureTracks(df):
@@ -67,6 +70,24 @@ def format_SignatureTracks(df):
     '''
     return df
 
+
+# helper functions
+def nested_stripper(string_list):
+    s = [x.strip(" ") for x in string_list]
+    return s
+
+def clean_composer_publisher_FTM_AA(s):
+    s = s.replace("),", ";")
+    s = s.replace("(",",")
+    s = s.replace(")","")
+    s = s.replace("%", "%,")
+    s = s.replace("IPI#","")
+    s = s.split(";",-1)
+    s = [nested_stripper(x.split(",",-1)) for x in s]
+    cleaned_s = s 
+    return cleaned_s
+
+    
 if __name__ == "__main__":
     print("Running file merger")
     final_columns = ["File Name", "Song Name", "Library", "Composer","Publisher","Catalogue Number"]
@@ -77,6 +98,6 @@ if __name__ == "__main__":
         ,{"vendor":"STKA","filename": "data/STKA_CLIENT_ThruADD86.xlsx"}
     ]
 
-    df = format_AA(read_vendor_file(vendor_files[1]))
-    print(df.head())
-    
+    df = format_FTM(read_vendor_file(vendor_files[0]))
+    print(df[["Composer","Publisher"]].head())
+    # print(clean_composer_publisher_FTM_AA(df.loc[0,"Composer"]))
