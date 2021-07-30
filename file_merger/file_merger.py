@@ -36,10 +36,7 @@ def format_AA(df):
         output: pandas DataFrame with columns specified by final_columns
             ex. ["File Name", "Song Name", "Library", "Composer","Publisher","Catalogue Number"]
     '''
-    df.rename(columns = {"Cue Title":"File Name", "Writers":"Composer", "Publishers":"Publisher", "ISRC":"Catalogue Number"}, inplace=True)
-    df["Song Name"]=df["File Name"].str[len("AA_"):]
-    df["Composer"] = df["Composer"].apply(lambda x: clean_composer_publisher_FTM_AA(x))
-    df["Publisher"] = df["Publisher"].apply(lambda x: clean_composer_publisher_FTM_AA(x))
+    df = _format_FTMAA(df,"AA_")
     return df[final_columns]
 
 def format_FTM(df):
@@ -51,11 +48,17 @@ def format_FTM(df):
         output: pandas DataFrame with columns specified by final_columns
             ex. ["File Name", "Song Name", "Library", "Composer","Publisher","Catalogue Number"]
     '''    
+    df = _format_FTMAA(df,"FTMX_")
+    return df[final_columns]
+
+def _format_FTMAA(df, string):
+
     df.rename(columns = {"Cue Title":"File Name", "Writers":"Composer", "Publishers":"Publisher", "ISRC":"Catalogue Number"}, inplace=True)
-    df["Song Name"]=df["File Name"].str[len("FTMX_"):]
+    df["Song Name"]=df["File Name"].str[len(string):]
     df["Composer"] = df["Composer"].apply(lambda x: clean_composer_publisher_FTM_AA(x))
     df["Publisher"] = df["Publisher"].apply(lambda x: clean_composer_publisher_FTM_AA(x))
-    return df[final_columns]
+    
+    return df
 
 def format_SignatureTracks(df):
     '''
@@ -72,7 +75,7 @@ def format_SignatureTracks(df):
 
 
 # helper functions
-def nested_stripper(string_list):
+def strip_list(string_list):
     s = [x.strip(" ") for x in string_list]
     return s
 
@@ -83,7 +86,8 @@ def clean_composer_publisher_FTM_AA(s):
     s = s.replace("%", "%,")
     s = s.replace("IPI#","")
     s = s.split(";",-1)
-    s = [nested_stripper(x.split(",",-1)) for x in s]
+    s = [strip_list(x.split(",",-1)) for x in s]
+    
     cleaned_s = s 
     return cleaned_s
 
