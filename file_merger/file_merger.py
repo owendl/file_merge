@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import numpy as np
 import argparse
 
 
@@ -57,7 +58,7 @@ def _format_FTMAA(df, string):
     df["Song Name"]=df["File Name"].str[len(string):]
     df["Composer"] = df["Composer"].apply(lambda x: clean_composer_publisher_FTM_AA(x))
     df["Publisher"] = df["Publisher"].apply(lambda x: clean_composer_publisher_FTM_AA(x))
-    
+
     return df
 
 def format_SignatureTracks(df):
@@ -71,8 +72,25 @@ def format_SignatureTracks(df):
         ex. ["File Name", "Song Name", "Library", "Composer","Publisher","Catalogue Number"]
     
     '''
+    publishers = df[[x for x in df.columns if "publisher" in x.lower()]]
+
+    df["Publisher_test"] = publishers.apply(lambda x: _format_Sig_publishers(x), axis = "columns")    
+
+    
+    writers = df[[x for x in df.columns if "writer" in x.lower()]]
+
+
     return df
 
+def _format_Sig_publishers(s):
+    pub_list = []
+    for i in range(1,6):
+        if s["Publisher "+str(i)+" Company"]:
+            pub = [s["Publisher "+str(i)+" Company"], str(missing_value(s['Publisher '+str(i)+' Ownership Share']))+"%",s['Publisher '+str(i)+' Pro Affiliation'],str(missing_value(s['Publisher '+str(i)+' CAE/IPI']))]
+            pub_list.append(pub)
+        else:
+            break
+    return pub_list
 
 # helper functions
 def strip_list(string_list):
@@ -91,6 +109,12 @@ def clean_composer_publisher_FTM_AA(s):
     cleaned_s = s 
     return cleaned_s
 
+def missing_value(n):
+    if np.isnan(n):
+        return int(0)
+    else:
+        return int(n)
+
     
 if __name__ == "__main__":
     print("Running file merger")
@@ -102,6 +126,7 @@ if __name__ == "__main__":
         ,{"vendor":"STKA","filename": "data/STKA_CLIENT_ThruADD86.xlsx"}
     ]
 
-    df = format_FTM(read_vendor_file(vendor_files[0]))
-    print(df[["Composer","Publisher"]].head())
+    df = format_SignatureTracks(read_vendor_file(vendor_files[2]))
+    # print(df[["Composer","Publisher"]].head())
     # print(clean_composer_publisher_FTM_AA(df.loc[0,"Composer"]))
+    print(df["Publisher_test"].head())
