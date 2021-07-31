@@ -7,13 +7,15 @@ import re
 def generic():
     print("generic function")
 
-def read_vendor_file(input):
+def read_file(input):
     sheetname= input.get("sheetname", 0)
     df = pd.read_excel(input.get("filename"), sheet_name=sheetname)
-    df["Library"] = input.get("vendor")
+    vendor = input.get("vendor")
+    if vendor:
+        df["Library"] = vendor
     return df
 
-def format_STKA(df):
+def format_STKA(df, final_columns):
     '''
     function for custom processing of STKA formatted vendor excel file
 
@@ -28,7 +30,7 @@ def format_STKA(df):
     df["Library"] = "STKA"
 
     df["Composer"] = df["Composer"].apply(lambda x :_stka_composerpublisher(x))
-    df["Writer"] = df["Writer"].apply(lambda x :_stka_composerpublisher(x))
+    df["Publisher"] = df["Publisher"].apply(lambda x :_stka_composerpublisher(x))
     
     df["Catalogue Number"] = ""
 
@@ -38,15 +40,14 @@ def _stka_composerpublisher(s):
     '''
     Anthony M Caruso, BMI, 100%, 500352804|Bayham Music Library, BMI, 100%, 358038941	
     '''
+    
     l = s.split("/",-1)
-
+    
     s = [strip_list(re.split("\(|\)", x)) for x in l]
+    
+    return [x + [""] for x in s]
 
-    s = [x.append("") for x in s]
-
-    return s
-
-def format_AA(df):
+def format_AA(df, final_columns):
     '''
         function for custom processing of FTM formatted vendor excel file
 
@@ -58,7 +59,7 @@ def format_AA(df):
     df = _format_FTMAA(df,"AA_")
     return df[final_columns]
 
-def format_FTM(df):
+def format_FTM(df, final_columns):
     '''
         function for custom processing of FTM formatted vendor excel file
 
@@ -81,7 +82,7 @@ def _format_FTMAA(df, string):
 
     return df
 
-def format_SignatureTracks(df):
+def format_SignatureTracks(df, final_columns):
     '''
     TODO
     function for custom processing of Signature Tracks formatted vendor excel file
@@ -95,7 +96,8 @@ def format_SignatureTracks(df):
     "File Name", "Song Name", "Library",
 
     df.rename(columns = {"Title": "File Name"}, inplace = True)
-    df["Song Name"]=df["File Name"].str[len("SIG "):]
+    df["File Name"] = df["File Name"].str.split(".",1).str[0]
+    df["Song Name"] = df["File Name"].str[len("SIG "):]
     
     df["Library"] = "SIG"
 
@@ -109,8 +111,8 @@ def format_SignatureTracks(df):
 def _format_Sig_writers(s):
     pub_list = []
     for i in range(1,8):
-        if s["Publisher "+str(i)+" Company"]:
-            pub = [s["Writer "+str(i)+" First Name"] +" "+s["Writer "+str(i)+" Last Name"], s['Writer '+str(i)+' Pro Affiliation'],str(missing_value(s['Writer '+str(i)+' Ownership Share']))+"%",str(missing_value(s['Writer '+str(i)+' CAE/IPI']))]
+        if not pd.isna(s["Writer "+str(i)+" First Name"]):
+            pub = [str(s["Writer "+str(i)+" First Name"]) +" "+str(s["Writer "+str(i)+" Last Name"]), s['Writer '+str(i)+' Pro Affiliation'],str(missing_value(s['Writer '+str(i)+' Ownership Share']))+"%",str(missing_value(s['Writer '+str(i)+' CAE/IPI']))]
             pub_list.append(pub)
         else:
             break
@@ -119,7 +121,7 @@ def _format_Sig_writers(s):
 def _format_Sig_publishers(s):
     pub_list = []
     for i in range(1,6):
-        if s["Publisher "+str(i)+" Company"]:
+        if not pd.isna(s["Publisher "+str(i)+" Company"]):
             pub = [s["Publisher "+str(i)+" Company"], s['Publisher '+str(i)+' Pro Affiliation'], str(missing_value(s['Publisher '+str(i)+' Ownership Share']))+"%",str(missing_value(s['Publisher '+str(i)+' CAE/IPI']))]
             pub_list.append(pub)
         else:
@@ -143,10 +145,10 @@ def clean_composer_publisher_FTM_AA(s):
     return s
 
 def missing_value(n):
-    if np.isnan(n):
-        return int(0)
-    elif isinstance(n, str):
+    if isinstance(n, str):
         return n
+    elif np.isnan(n):
+        return int(0)
     else:
         return int(n)
 
@@ -161,4 +163,6 @@ if __name__ == "__main__":
         ,{"vendor":"STKA","filename": "data/STKA_CLIENT_ThruADD86.xlsx"}
     ]
 
-    df = format_SignatureTracks(read_vendor_file(vendor_files[2]))
+    df = read_file(vendor_files[3])
+
+    print(_stka_composerpublisher(df["Composer"][0]))
