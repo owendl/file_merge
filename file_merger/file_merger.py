@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import numpy as np
-import argparse
+import re
 
 
 def generic():
@@ -25,8 +25,26 @@ def format_STKA(df):
 
     df["Song Name"]=df["Track Title"].str[len("STKA_"):]
     df.rename(columns = {"Track Title":"File Name"}, inplace=True)
+    df["Library"] = "STKA"
+
+    df["Composer"] = df["Composer"].apply(lambda x :_stka_composerpublisher(x))
+    df["Writer"] = df["Writer"].apply(lambda x :_stka_composerpublisher(x))
+    
     df["Catalogue Number"] = ""
+
     return df[final_columns]
+
+def _stka_composerpublisher(s):
+    '''
+    Anthony M Caruso, BMI, 100%, 500352804|Bayham Music Library, BMI, 100%, 358038941	
+    '''
+    l = s.split("/",-1)
+
+    s = [strip_list(re.split("\(|\)", x)) for x in l]
+
+    s = [x.append("") for x in s]
+
+    return s
 
 def format_AA(df):
     '''
@@ -59,6 +77,8 @@ def _format_FTMAA(df, string):
     df["Composer"] = df["Composer"].apply(lambda x: clean_composer_publisher_FTM_AA(x))
     df["Publisher"] = df["Publisher"].apply(lambda x: clean_composer_publisher_FTM_AA(x))
 
+    df["Library"] = string[:-1]
+
     return df
 
 def format_SignatureTracks(df):
@@ -72,21 +92,35 @@ def format_SignatureTracks(df):
         ex. ["File Name", "Song Name", "Library", "Composer","Publisher","Catalogue Number"]
     
     '''
-    publishers = df[[x for x in df.columns if "publisher" in x.lower()]]
+    "File Name", "Song Name", "Library",
 
-    df["Publisher_test"] = publishers.apply(lambda x: _format_Sig_publishers(x), axis = "columns")    
-
+    df.rename(columns = {"Title": "File Name"}, inplace = True)
+    df["Song Name"]=df["File Name"].str[len("SIG "):]
     
-    writers = df[[x for x in df.columns if "writer" in x.lower()]]
+    df["Library"] = "SIG"
 
+    df["Publisher"] = df.apply(lambda x: _format_Sig_publishers(x), axis = "columns")   
+    df["Composer"] = df.apply(lambda x: _format_Sig_writers(x), axis = "columns")
 
-    return df
+    df["Catalogue Number"] = ""
+
+    return df[final_columns]
+
+def _format_Sig_writers(s):
+    pub_list = []
+    for i in range(1,8):
+        if s["Publisher "+str(i)+" Company"]:
+            pub = [s["Writer "+str(i)+" First Name"] +" "+s["Writer "+str(i)+" Last Name"], s['Writer '+str(i)+' Pro Affiliation'],str(missing_value(s['Writer '+str(i)+' Ownership Share']))+"%",str(missing_value(s['Writer '+str(i)+' CAE/IPI']))]
+            pub_list.append(pub)
+        else:
+            break
+    return pub_list
 
 def _format_Sig_publishers(s):
     pub_list = []
     for i in range(1,6):
         if s["Publisher "+str(i)+" Company"]:
-            pub = [s["Publisher "+str(i)+" Company"], str(missing_value(s['Publisher '+str(i)+' Ownership Share']))+"%",s['Publisher '+str(i)+' Pro Affiliation'],str(missing_value(s['Publisher '+str(i)+' CAE/IPI']))]
+            pub = [s["Publisher "+str(i)+" Company"], s['Publisher '+str(i)+' Pro Affiliation'], str(missing_value(s['Publisher '+str(i)+' Ownership Share']))+"%",str(missing_value(s['Publisher '+str(i)+' CAE/IPI']))]
             pub_list.append(pub)
         else:
             break
@@ -106,12 +140,13 @@ def clean_composer_publisher_FTM_AA(s):
     s = s.split(";",-1)
     s = [strip_list(x.split(",",-1)) for x in s]
     
-    cleaned_s = s 
-    return cleaned_s
+    return s
 
 def missing_value(n):
     if np.isnan(n):
         return int(0)
+    elif isinstance(n, str):
+        return n
     else:
         return int(n)
 
@@ -127,6 +162,3 @@ if __name__ == "__main__":
     ]
 
     df = format_SignatureTracks(read_vendor_file(vendor_files[2]))
-    # print(df[["Composer","Publisher"]].head())
-    # print(clean_composer_publisher_FTM_AA(df.loc[0,"Composer"]))
-    print(df["Publisher_test"].head())
