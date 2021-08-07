@@ -128,6 +128,58 @@ def _format_Sig_publishers(s):
             break
     return pub_list
 
+def format_DMS(df, final_columns):
+    
+    '''
+    output: pandas DataFrame with columns specified by final_columns
+        ex. ["File Name", "Song Name", "Library", "Composer","Publisher","Catalogue Number"]
+    '''
+    df["File Name"] = df["Filename"].str.split(".",1).str[0]
+    df["Library"] = "03M Music"
+    df.rename(columns={"TrackTitle":"Song Name"}, inplace = True)
+
+    df["Catalogue Number"]=""
+
+    df["Publisher"] = df["Publisher"].apply(lambda x: _format_DMSpublisher(x))   
+    df["Composer"] = df["Composer"].apply(lambda x: _format_DMSpublisher(x))
+
+    return df[final_columns]
+
+def _format_DMSpublisher(s):
+    '''
+    composer
+    [['Bradley A. Segal', '50%', 'ASCAP', '220264025'], ['Eric Abrahamson', '50%', 'ASCAP', '454293448']]
+
+    vendor
+    [['Finely Tuned Music', '50%', 'ASCAP', '470632857'], ['F T Music', '50%', 'BMI', '197634721']]
+    '''
+    s_final = []
+    if s and isinstance(s, str):
+        s = re.sub(r"\[|\]","",s)
+        s_list = s.split(",",-1)
+        if len(s_list)>1:
+            try:
+                for st in s_list:
+                    st = strip_list(re.split("\(|\)|%", st))
+                    if "#" in st[1]:
+                        # print("#included")
+                        rep_num = strip_list(st[1].split("#"))
+                        st = [st[0], st[2]+"%", rep_num[0], rep_num[1]]
+                    else:
+                        # print("not #")
+                        st = [st[x] for x in [0,2,1,3]]
+                        st[1]=st[1]+"%"
+                    s_final.append(st)
+            except Exception as e:
+                print("Ran into error while parsing a row from DMS, skipping the row: ")
+                print(s_list)
+                print(e)
+        else:
+            st = s_list
+    else:
+        s_final = []
+    return s_final
+
 # helper functions
 def strip_list(string_list):
     s = [x.strip(" ") for x in string_list]
@@ -161,8 +213,12 @@ if __name__ == "__main__":
         ,{"vendor":"AA","filename": "data/FTM-AA_COMPOSER-PUBLISHER_6-16-21.xlsx", "sheetname":"AA"}
         ,{"vendor":"SignatureTracks","filename": "data/Signature Tracks - Composer Publisher Info_072621.xlsx"}
         ,{"vendor":"STKA","filename": "data/STKA_CLIENT_ThruADD86.xlsx"}
+        ,{"vendor":"DMS", "filename": "data/Crazy Legs Productions_Metadata.xlsx", "sheetname":"DMS"}
     ]
 
-    df = read_file(vendor_files[3])
-
-    print(_stka_composerpublisher(df["Composer"][0]))
+    df = read_file(vendor_files[4])
+    
+    
+    
+    print(df["Publisher"].apply(lambda x: _format_DMSpublisher(x)))
+    # print(df["Composer"].applymap(_format_DMSpublisher))
