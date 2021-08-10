@@ -8,6 +8,13 @@ def generic():
     print("generic function")
 
 def read_file(input):
+    '''
+    inputs: a dictionary containing strings for:
+        * filename: location of excel file to be read
+        * Library: the name of the vendor, added as a field in the returned dataframe
+        * sheetname (optional): the sheet within the excel corresponding to the vendor
+
+    '''
     sheetname= input.get("sheetname", 0)
     df = pd.read_excel(input.get("filename"), sheet_name=sheetname)
     vendor = input.get("vendor")

@@ -1,10 +1,5 @@
-
 import file_merger.file_merger as fm
 import pandas as pd
-
-
-
-fm.generic()
 
 final_columns = ["File Name", "Song Name", "Library", "Composer","Publisher","Catalogue Number"]
 vendor_files = [
