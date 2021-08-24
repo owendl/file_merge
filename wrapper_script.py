@@ -11,6 +11,7 @@ vendor_files = [
         ,{"vendor":"STKA","filename": "data/STKA_CLIENT_ThruADD86.xlsx"}
          ,{"vendor":"DMS", "filename": "data/Crazy Legs Productions_Metadata.xlsx", "sheetname":"DMS"}
     ]
+# vendor_files=[]
 cue_sheet = "data/TOO LARGE JENNIFER CUE SHEETS 106 MU.xls"
 
 
@@ -39,4 +40,4 @@ df = parse_cue_sheet(cue_sheet)
 final = pd.merge(df, vendors, on="File Name", how="left")
 
 with pd.ExcelWriter("data/matches.xlsx") as writer:
-    final.to_excel(writer,index=False)
+    final[~final["Library"].isna()].to_excel(writer,sheet_name = "Exact Match",index=False)
