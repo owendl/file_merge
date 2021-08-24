@@ -4,14 +4,14 @@ import pandas as pd
 
 
 final_columns = ["File Name", "Song Name", "Library", "Composer","Publisher","Catalogue Number"]
-vendor_files = [
-        {"vendor":"FTM","filename": "data/FTM-AA_COMPOSER-PUBLISHER_6-16-21.xlsx", "sheetname":"FTM"}
-        ,{"vendor":"AA","filename": "data/FTM-AA_COMPOSER-PUBLISHER_6-16-21.xlsx", "sheetname":"AA"}
-        ,{"vendor":"SignatureTracks","filename": "data/Signature Tracks - Composer Publisher Info_072621.xlsx"}
-        ,{"vendor":"STKA","filename": "data/STKA_CLIENT_ThruADD86.xlsx"}
-         ,{"vendor":"DMS", "filename": "data/Crazy Legs Productions_Metadata.xlsx", "sheetname":"DMS"}
-    ]
-# vendor_files=[]
+# vendor_files = [
+#         {"vendor":"FTM","filename": "data/FTM-AA_COMPOSER-PUBLISHER_6-16-21.xlsx", "sheetname":"FTM"}
+#         ,{"vendor":"AA","filename": "data/FTM-AA_COMPOSER-PUBLISHER_6-16-21.xlsx", "sheetname":"AA"}
+#         ,{"vendor":"SignatureTracks","filename": "data/Signature Tracks - Composer Publisher Info_072621.xlsx"}
+#         ,{"vendor":"STKA","filename": "data/STKA_CLIENT_ThruADD86.xlsx"}
+#          ,{"vendor":"DMS", "filename": "data/Crazy Legs Productions_Metadata.xlsx", "sheetname":"DMS"}
+#     ]
+vendor_files=[]
 cue_sheet = "data/TOO LARGE JENNIFER CUE SHEETS 106 MU.xls"
 
 
@@ -41,3 +41,5 @@ final = pd.merge(df, vendors, on="File Name", how="left")
 
 with pd.ExcelWriter("data/matches.xlsx") as writer:
     final[~final["Library"].isna()].to_excel(writer,sheet_name = "Exact Match",index=False)
+    final[final["Library"].isna()].to_excel(writer,sheet_name = "No Match",index=False)
+
