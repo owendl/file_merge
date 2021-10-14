@@ -44,12 +44,12 @@ exact_match = final[~final["Library"].isna()]
 
 no_match = final[final["Library"].isna()]
 
-if __name__ == "__main__":
-    import file_merger.fuzzy_matcher as fuzzy
-    partial_match, no_match = fuzzy.fuzzy_matcher(no_match, vendors)
 
-    with pd.ExcelWriter("data/matches.xlsx") as writer:
-        exact_match.to_excel(writer,sheet_name = "Exact Match",index=False)
-        partial_match.to_excel(writer,sheet_name = "Partial Match",index=False)
-        no_match.to_excel(writer,sheet_name = "No Match",index=False)
+import file_merger.fuzzy_matcher as fuzzy
+partial_match, no_match = fuzzy.fuzzy_matcher(no_match, vendors)
+
+with pd.ExcelWriter("data/matches.xlsx") as writer:
+    exact_match.to_excel(writer,sheet_name = "Exact Match",index=False)
+    partial_match.to_excel(writer,sheet_name = "Partial Match",index=False)
+    no_match.to_excel(writer,sheet_name = "No Match",index=False)
 
