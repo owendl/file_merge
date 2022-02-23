@@ -48,7 +48,7 @@ no_match = final[final["Library"].isna()]
 import file_merger.fuzzy_matcher as fuzzy
 partial_match, no_match = fuzzy.fuzzy_matcher(no_match, vendors)
 
-with pd.ExcelWriter("data/matches.xlsx") as writer:
+with pd.ExcelWriter(f"data/{cue_sheet.split('.')[0][5:]}-matches.xlsx") as writer:
     exact_match.to_excel(writer,sheet_name = "Exact Match",index=False)
     partial_match.to_excel(writer,sheet_name = "Partial Match",index=False)
     no_match.to_excel(writer,sheet_name = "No Match",index=False)
