@@ -17,8 +17,8 @@ vendor_files = [
 cue_sheet = "data/TOO LARGE JENNIFER CUE SHEETS 106 MU.xls"
 
 
-def parse_cue_sheet(string):
-    df = pd.read_excel(string, skiprows=15)
+def parse_cue_sheet(string, n = 0):
+    df = pd.read_excel(string, skiprows = n)
     df.dropna(how="any", inplace=True)
     new_columns = [x.strip() for x in df.columns.tolist()]
     df.columns = new_columns
