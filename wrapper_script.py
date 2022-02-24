@@ -2,20 +2,25 @@ import file_merger.file_merger as fm
 
 import pandas as pd
 
-
+# Flag whether to run the building of the vendor file
+# If run_vendors = True, then all of the specified vendor files will be read incrementally, consolidated and written to a new file
+# If run_vendors = False, then it will skip the reading and consolidating and try to read from a previously written vendors file
 run_vendors = True
 
-final_columns = ["File Name", "Song Name", "Library", "Composer","Publisher","Catalogue Number"]
-vendor_files = [
-        {"vendor":"FTM","filename": "data/FTM-AA_COMPOSER-PUBLISHER_6-16-21.xlsx", "sheetname":"FTM"}
-        ,{"vendor":"AA","filename": "data/FTM-AA_COMPOSER-PUBLISHER_6-16-21.xlsx", "sheetname":"AA"}
-        ,{"vendor":"SignatureTracks","filename": "data/Signature Tracks - Composer Publisher Info_072621.xlsx"}
-        ,{"vendor":"STKA","filename": "data/STKA_CLIENT_ThruADD86.xlsx"}
-          ,{"vendor":"DMS", "filename": "data/Crazy Legs Productions_Metadata.xlsx", "sheetname":"DMS"}
-    ]
-
+# Modified cue sheet to be read from (modified to remove extra rows before clips portion)
 cue_sheet = "data/TOO LARGE JENNIFER CUE SHEETS 106 MU.xls"
 
+# Most recent vendor database files 
+vendor_files = [
+        {"vendor":"FTM","filename": "data/FTM-AA_COMPOSER-PUBLISHER_6-16-21.xlsx", "sheetname":"FTM"},
+        {"vendor":"AA","filename": "data/FTM-AA_COMPOSER-PUBLISHER_6-16-21.xlsx", "sheetname":"AA"},
+        {"vendor":"SignatureTracks","filename": "data/Signature Tracks - Composer Publisher Info_072621.xlsx"},
+        {"vendor":"STKA","filename": "data/STKA_CLIENT_ThruADD86.xlsx"},
+          {"vendor":"DMS", "filename": "data/Crazy Legs Productions_Metadata.xlsx", "sheetname":"DMS"},
+    ]
+
+
+final_columns = ["File Name", "Song Name", "Library", "Composer","Publisher","Catalogue Number"]
 
 def parse_cue_sheet(string, n = 0):
     df = pd.read_excel(string, skiprows = n)
