@@ -142,7 +142,7 @@ def format_DMS(df, final_columns):
         ex. ["File Name", "Song Name", "Library", "Composer","Publisher","Catalogue Number"]
     '''
     df["File Name"] = df["Filename"].str.split(".",1).str[0]
-    df["Library"] = "03M Music"
+    # df["Library"] = "03M Music"
     df.rename(columns={"TrackTitle":"Song Name"}, inplace = True)
 
     df["Catalogue Number"]=""
@@ -182,7 +182,7 @@ def _format_DMSpublisher(s):
                 print(s_list)
                 print(e)
         else:
-            st = s_list
+            s_final = s_list
     else:
         s_final = []
     return s_final
