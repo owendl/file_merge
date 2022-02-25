@@ -18,7 +18,8 @@ def read_file(input):
     sheetname= input.get("sheetname", 0)
     df = pd.read_excel(input.get("filename"), sheet_name=sheetname)
     vendor = input.get("vendor")
-    if vendor:
+    
+    if vendor != "DMS":
         df["Library"] = vendor
     return df
 
@@ -142,9 +143,9 @@ def format_DMS(df, final_columns):
         ex. ["File Name", "Song Name", "Library", "Composer","Publisher","Catalogue Number"]
     '''
     df["File Name"] = df["Filename"].str.split(".",1).str[0]
-    # df["Library"] = "03M Music"
     df.rename(columns={"TrackTitle":"Song Name"}, inplace = True)
 
+    
     df["Catalogue Number"]=""
 
     df["Publisher"] = df["Publisher"].apply(lambda x: _format_DMSpublisher(x))   

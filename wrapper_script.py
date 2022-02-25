@@ -8,7 +8,7 @@ import pandas as pd
 run_vendors = True
 
 # Modified cue sheet to be read from (modified to remove extra rows before clips portion)
-cue_sheet = "data/TOO LARGE JENNIFER CUE SHEETS 106 MU.xls"
+cue_sheet = "data/TLC-1KBFF-101 ITE MUSIC CUES.xlsx"
 
 # Most recent vendor database files 
 vendor_files = [
@@ -16,7 +16,7 @@ vendor_files = [
         {"vendor":"AA","filename": "data/FTM-AA_COMPOSER-PUBLISHER_6-16-21.xlsx", "sheetname":"AA"},
         {"vendor":"SignatureTracks","filename": "data/Signature Tracks - Composer Publisher Info_072621.xlsx"},
         {"vendor":"STKA","filename": "data/STKA_CLIENT_ThruADD86.xlsx"},
-          {"vendor":"DMS", "filename": "data/Crazy Legs Productions_Metadata.xlsx", "sheetname":"DMS"},
+          {"vendor":"DMS", "filename": "data/DMS_FullCatalog_2022-01-11.xlsx"},
     ]
 
 
