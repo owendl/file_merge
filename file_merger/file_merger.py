@@ -153,7 +153,7 @@ def format_DMS(df, final_columns):
 
     return df[final_columns]
 
-def _format_DMSpublisher(s):
+def _format_DMSpublisher(s_raw):
     '''
     composer
     [['Bradley A. Segal', '50%', 'ASCAP', '220264025'], ['Eric Abrahamson', '50%', 'ASCAP', '454293448']]
@@ -162,28 +162,28 @@ def _format_DMSpublisher(s):
     [['Finely Tuned Music', '50%', 'ASCAP', '470632857'], ['F T Music', '50%', 'BMI', '197634721']]
     '''
     s_final = []
-    if s and isinstance(s, str):
-        s = re.sub(r"\[|\]","",s)
+    if s_raw and isinstance(s_raw, str):
+        s = re.sub(r"\[|\]","",s_raw)
         s_list = s.split(",",-1)
-        if len(s_list)>1:
-            try:
-                for st in s_list:
-                    st = strip_list(re.split("\(|\)|%", st))
-                    if "#" in st[1]:
-                        # print("#included")
-                        rep_num = strip_list(st[1].split("#"))
-                        st = [st[0], st[2]+"%", rep_num[0], rep_num[1]]
-                    else:
-                        # print("not #")
-                        st = [st[x] for x in [0,2,1,3]]
-                        st[1]=st[1]+"%"
-                    s_final.append(st)
-            except Exception as e:
-                print("Ran into error while parsing a row from DMS, skipping the row: ")
-                print(s_list)
-                print(e)
-        else:
-            s_final = s_list
+    
+        try:
+            for st in s_list:
+                st = strip_list(re.split("\(|\)|%", st))
+                if "#" in st[1]:
+                    # print("#included")
+                    rep_num = strip_list(st[1].split("#"))
+                    st = [st[0], st[2]+"%", rep_num[0], rep_num[1]]
+                else:
+                    # print("not #")
+                    st = [st[x] for x in [0,2,1,3]]
+                    st[1]=st[1]+"%"
+                s_final.append(st)
+        except Exception as e:
+            # print("Ran into error while parsing a row from DMS, returning the raw string")
+            # print(s_list)
+            # print(e)
+            return s_raw
+    
     else:
         s_final = []
     return s_final
