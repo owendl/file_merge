@@ -7,7 +7,7 @@ import re
 def generic():
     print("generic function")
 
-def read_file(input):
+def read_file(folder, file):
     '''
     inputs: a dictionary containing strings for:
         * filename: location of excel file to be read
@@ -15,10 +15,9 @@ def read_file(input):
         * sheetname (optional): the sheet within the excel corresponding to the vendor
 
     '''
-    sheetname= input.get("sheetname", 0)
-    df = pd.read_excel(input.get("filename"), sheet_name=sheetname)
-    vendor = input.get("vendor")
     
+    df = pd.read_excel(os.path.join(folder, file))
+    vendor = file.split("_",1)[0]
     if vendor != "DMS":
         df["Library"] = vendor
     return df
