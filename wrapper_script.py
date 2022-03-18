@@ -5,8 +5,11 @@ import os
 
 print("Starting process")
 
-cue_sheet_folder = "data/cue_sheets"
-vendor_file = "data/vendor_files/vendors.csv"
+data = os.path.abspath(os.path.join(os.path.dirname(__file__), 'data'))
+
+cue_sheet_folder = os.path.join(data, "cue_sheets")
+vendor_files_folder = os.path.join(data, "vendors")
+vendor_file = os.path.join(vendor_files_folder,"vendors.csv")
 
 supported_vendors = ["STKA", "AA", "FTM", "SignatureTracks", "DMS"]
 
@@ -17,7 +20,7 @@ def build_vendor_files():
         
     else:
 
-        vendor_files = os.listdir("data/vendor_files")
+        vendor_files = os.listdir(vendor_files_folder)
         print(f"Could not find consolidated vendor file: {vendor_file}, attempting to create one from files in data/vendor_files: {vendor_files}")
         vendors = pd.DataFrame()
 
@@ -30,7 +33,7 @@ def build_vendor_files():
             if vendor_type not in supported_vendors:
                 print(f"Vendor file format {vendor_type} is not one of the currently supported vendor file formats: {supported_vendors}\nSkipping this file")
                 continue
-            result = getattr(fm, 'format_'+vendor_type)(fm.read_file("data/vendor_files",vf), final_columns)
+            result = getattr(fm, 'format_'+vendor_type)(fm.read_file(vendor_files_folder,vf), final_columns)
             vendors = pd.concat([vendors, result])
 
         
@@ -75,7 +78,7 @@ for cue_sheet in cue_sheets:
 
     print(f"Finished fuzzy match for {cue_sheet}, begin writing results")
 
-    with pd.ExcelWriter(f"data/matches/{cue_sheet.split('.')[0]}-matches.xlsx") as writer:
+    with pd.ExcelWriter(os.path.join(data,f"{cue_sheet.split('.')[0]}-matches.xlsx")) as writer:
         exact_match.to_excel(writer,sheet_name = "Exact Match",index=False)
         partial_match.to_excel(writer,sheet_name = "Partial Match",index=False)
         no_match.to_excel(writer,sheet_name = "No Match",index=False)
