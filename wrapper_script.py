@@ -8,7 +8,7 @@ print("Starting process")
 data = os.path.abspath(os.path.join(os.path.dirname(__file__), 'data'))
 
 cue_sheet_folder = os.path.join(data, "cue_sheets")
-vendor_files_folder = os.path.join(data, "vendors")
+vendor_files_folder = os.path.join(data, "vendor_files")
 vendor_file = os.path.join(vendor_files_folder,"vendors.csv")
 
 supported_vendors = ["STKA", "AA", "FTM", "SignatureTracks", "DMS"]
@@ -16,7 +16,7 @@ supported_vendors = ["STKA", "AA", "FTM", "SignatureTracks", "DMS"]
 def build_vendor_files():
     if os.path.isfile(vendor_file):
         print("Started reading in consolidated vendor file")
-        vendors = pd.read_excel(vendor_file)
+        vendors = pd.read_csv(vendor_file)
         
     else:
 
