@@ -2,6 +2,7 @@ import Levenshtein as pl
 import pandas as pd
 import math
 import time
+from tqdm import tqdm
 
 # print(pl.distance("caser", "case hhh"))
 
@@ -10,10 +11,10 @@ def fuzzy_matcher(test_match, vendors):
 
     partial_match = pd.DataFrame()
 
-    for index1, row1 in test_match.iterrows():
+    for index1, row1 in tqdm(test_match.iterrows(), total = test_match.shape[0]):
         found_match = False
         if row1["File Name"].startswith("21S_"):
-            no_match = no_match.append(row1)
+            no_match = pd.concat([no_match,row1])
             continue
         # print("checking "+ str(index1)+" "+ str(row1["File Name"]))
         for index2, row2 in vendors.iterrows():
@@ -25,12 +26,12 @@ def fuzzy_matcher(test_match, vendors):
                 for index, value in row2.items():
                     row1[index] = value
                 row1["match_percent"] = mp
-                partial_match = partial_match.append(row1)
+                partial_match = pd.concat([partial_match,row1])
         
         if found_match:
             continue
         else:
-            no_match = no_match.append(row1)
+            no_match = pd.concat([no_match,row1])
     
 
     return partial_match, no_match
