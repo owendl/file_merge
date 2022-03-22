@@ -71,16 +71,9 @@ for cue_sheet in cue_sheets:
     exact_match = final[~final["Library"].isna()]
 
     no_match = final[final["Library"].isna()]
-    print(f"Finished exact match for {cue_sheet}, starting fuzzy match")
-
-    import file_merger.fuzzy_matcher as fuzzy
-    partial_match, no_match = fuzzy.fuzzy_matcher(no_match, vendors)
-
-    print(f"Finished fuzzy match for {cue_sheet}, begin writing results")
 
     with pd.ExcelWriter(os.path.join(data,f"{cue_sheet.split('.')[0]}-matches.xlsx")) as writer:
         exact_match.to_excel(writer,sheet_name = "Exact Match",index=False)
-        partial_match.to_excel(writer,sheet_name = "Partial Match",index=False)
         no_match.to_excel(writer,sheet_name = "No Match",index=False)
 
 print("Finished!")

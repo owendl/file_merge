@@ -14,7 +14,7 @@ def fuzzy_matcher(test_match, vendors):
     for index1, row1 in tqdm(test_match.iterrows(), total = test_match.shape[0]):
         found_match = False
         if row1["File Name"].startswith("21S_"):
-            no_match = pd.concat([no_match,row1])
+            no_match = pd.concat([no_match,row1.to_frame().T])
             continue
         # print("checking "+ str(index1)+" "+ str(row1["File Name"]))
         for index2, row2 in vendors.iterrows():
@@ -26,12 +26,12 @@ def fuzzy_matcher(test_match, vendors):
                 for index, value in row2.items():
                     row1[index] = value
                 row1["match_percent"] = mp
-                partial_match = pd.concat([partial_match,row1])
+                partial_match = pd.concat([partial_match,row1.to_frame().T])
         
         if found_match:
             continue
         else:
-            no_match = pd.concat([no_match,row1])
+            no_match = pd.concat([no_match,row1.to_frame().T])
     
 
     return partial_match, no_match
