@@ -1,31 +1,6 @@
 import Levenshtein as pl
 import pandas as pd
-# import multiprocessing
-# import math
 import time
-# import tqdm
-
-# print(pl.distance("caser", "case hhh"))
-
-# def fuzzy_matcher(test_match, vendors):
-#     num_processes = int(multiprocessing.cpu_count()/2)
-#     # calculate the chunk size as an integer
-#     chunk_size = int(math.ceil(test_match.shape[0]/(num_processes*5)))
-
-#     # this solution was reworked from the above link.
-#     # will work even if the length of the dataframe is not evenly divisible by num_processes
-#     rows = [test_match[i:i + chunk_size] for i in range(0, test_match.shape[0], chunk_size)]
-
-#     chunks = [(x, vendors.copy()) for x in rows]
-#     with multiprocessing.Pool(processes=num_processes) as p:
-#         # # apply our function to each chunk in the list
-#         # result = pool.map(func, chunks)
-#         result = list(tqdm.tqdm(p.imap(func, chunks), total=len(chunks)))
-        
-#     partial_matches = pd.concat([x[0] for x in result])
-#     no_matches = pd.concat([x[1] for x in result])
-#     return partial_matches, no_matches
-
 
 def match_percent(str1, str2):
     if isinstance(str1, str) and isinstance(str2, str):
@@ -71,11 +46,7 @@ if __name__ == "__main__":
     
     test_match = pd.read_excel("data/matches.xlsx", sheet_name="No Match")
 
-
     vendors = pd.read_excel("data/vendors.xlsx")
-
-    # print(test_match.head())
-    # print(vendors.head())
 
     partial_matches, no_matches = fuzzy_matcher(test_match, vendors)
     print("finished fuzzy matcher")
