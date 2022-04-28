@@ -76,10 +76,10 @@ if __name__ == "__main__":
 
     # print(test_match.head())
     # print(vendors.head())
-    t1 = time.time()
+
     partial_matches, no_matches = fuzzy_matcher(test_match, vendors)
     print("finished fuzzy matcher")
-    print(math.ceil(time.time()-t1))
+
     with pd.ExcelWriter("data/matches-test.xlsx") as writer:
         partial_matches.to_excel(writer,sheet_name = "Partial Match",index=False)
         no_matches.to_excel(writer,sheet_name = "Still No Match",index=False)

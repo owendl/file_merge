@@ -87,15 +87,13 @@ if __name__ == '__main__':
             # calculate the chunk size as an integer
             chunk_size = int(math.ceil(no_match.shape[0]/(num_processes*5)))
 
-            # this solution was reworked from the above link.
             # will work even if the length of the dataframe is not evenly divisible by num_processes
             rows = [no_match[i:i + chunk_size] for i in range(0, no_match.shape[0], chunk_size)]
 
             chunks = [(x, vendors.copy()) for x in rows]
             
             with multiprocessing.Pool(processes=num_processes) as p:
-                # # apply our function to each chunk in the list
-                # result = pool.map(func, chunks)
+                # apply our function to each chunk in the list
                 result = list(tqdm.tqdm(p.imap(fuzzy.fuzzy_matcher, chunks), total=len(chunks)))
                 
             partial_matches = pd.concat([x[0] for x in result])
